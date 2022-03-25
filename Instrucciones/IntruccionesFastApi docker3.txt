@@ -1,0 +1,21 @@
+ACtivamos el entorno:
+.\docker3\Scripts\activate
+
+luego ir a la carpeta code2 cd code2 y ejecutar el servidor
+
+Servidor FastAPI
+uvicorn app2:app --host=localhost --port="5050" --reload
+
+uvicorn app:app --host=localhost --port="5050"
+
+
+
+
+
+
+
+
+Ruta para ejecutar en docker Linux(donde esté el archivo docker-compose.yml):
+C:/Users/zuric/Documents/EntornosPython/Docker2
+
+docker-compose up
