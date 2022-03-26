@@ -72,20 +72,17 @@ def recibojson():
 @app.route('/recibirjson')
 def pasaratexto():
     jsontexto = get("http://localhost:5050/jsontexto").json()
-    #texto = json.loads(jsontexto)
-    return render_template('results2.html', jsontexto=jsontexto)
-    #return render_template('results2.html', jsontexto=jsontexto, texto=str(texto))
+    return render_template('results.html', jsontexto=jsontexto)
 
-@app.route('/convertiraudio') #, methods = ['GET', ])
+@app.route('/convertiraudio')
 def convertiraudio():
     #if request.method == 'GET':
-    result2 = json.loads(pasaratexto())
+    jsontexto2 = get("http://localhost:5050/jsontexto").json()
+    myobj = gTTS(text=jsontexto2, slow=False)
+    myobj.save(app.config['UPLOAD_FOLDER_AUDIO'] + '/audio.mp3')
+    playsound('C://Users//zuric//Documents//EntornosPython//Docker2//resultados//audio//audio.mp3')
+    return render_template("results.html", myobj=myobj, jsontexto2=jsontexto2, text=("Destino: " + UPLOAD_FOLDER_AUDIO))
 
-    myobj = gTTS(text=result2, slow=False)
-    myobj.save(app.config['UPLOAD_FOLDER_AUDIO'] + "/audio.mp3")
-    playsound(app.config['UPLOAD_FOLDER_AUDIO'] + "/audio.mp3")
-    return render_template("results.html", myobj=myobj)     
-         
 @app.route("/download/<filename>", methods=['GET']) #Para descargar archivos, no lo usamos
 #@app.route("http://localhost:5000/download/<filename>/download/*.*", methods=['GET'])
 def download(filename):

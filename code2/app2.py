@@ -13,13 +13,10 @@ import os, pytesseract, json
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-
-
 
 if os.environ.get('DOCKER', '') == "yes":
     DOWNLOAD_FOLDER = 'C:\\Users\\zuric\\Documents\\EntornosPython\\Docker2\\resultados\\images'
@@ -71,17 +68,14 @@ async def jsontexto():
     #Convertimos imagen a Texto
     img = Image.open(os.path.join(imgruta))
     text = pytesseract.image_to_string(img)
-    result = json.dumps(text)
-    #result2 = json.loads(result)
-    return {'json': result}
-    #return {'text': text}, {'json': result}, {'texto': result2}
+    json_compatible = jsonable_encoder(text)
+    return JSONResponse(content=json_compatible)
 
 @app.get('/imagen') # Asi mostramos la imagen leida
 async def imagen():
     if os.path.exists(imgruta):
         img = Image.open(os.path.join(imgruta))
         text = pytesseract.image_to_string(img)
-        
         return FileResponse(imgruta)
     return {"error": "El archivo no existe"}
 
