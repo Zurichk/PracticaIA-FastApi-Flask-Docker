@@ -9,7 +9,7 @@
 		<p>Imagen: {{img}} </p> 
 		<p> <img src="http://localhost:5050/imagen" width="300" height="150">  </p>
 		<p>Texto: {{text}}</p>
-		<p>Json: {{result}}</p>
+		<p>Json: {{result}}    <form action="http://localhost:5000/recibirjson"> <input type="submit" value="Enviar Json"/></form> </p>
 		{% else %}
 		<p>No hay imagen</p>
 		{% endif %}

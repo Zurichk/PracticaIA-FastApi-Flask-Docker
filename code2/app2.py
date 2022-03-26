@@ -1,20 +1,25 @@
-from werkzeug.utils import secure_filename
-from PIL import Image, ImageFilter
-import os
-import pytesseract
-import json
-import base64
-from requests import get
+#No los uso pero tengo alguna pruebas con ellos realizadas por eso los mantego
+#from werkzeug.utils import secure_filename
+#from fastapi.responses import StreamingResponse
+
+#from starlette.responses import RedirectResponse
+#from io import BytesIO
+#import base64
+#from requests import get
+
+from PIL import Image
+import os, pytesseract, json
+#FastApi
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-from fastapi.responses import PlainTextResponse, HTMLResponse, FileResponse
-from starlette.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 
-from fastapi import FastAPI, File, UploadFile, Request
-from fastapi.responses import StreamingResponse
-from io import BytesIO
+
 
 if os.environ.get('DOCKER', '') == "yes":
     DOWNLOAD_FOLDER = 'C:\\Users\\zuric\\Documents\\EntornosPython\\Docker2\\resultados\\images'
@@ -52,7 +57,6 @@ def image_filter(img: UploadFile = File(...)):
 nombreimagen = "1.png"
 imgruta = os.path.join(DOWNLOAD_FOLDER, nombreimagen)
 
-# Jinja2 template instance for returning webpage via template engine
 templates = Jinja2Templates(directory="templates")
 @app.get('/getimagen', response_class=HTMLResponse)
 async def getimagen(request: Request):
@@ -61,9 +65,6 @@ async def getimagen(request: Request):
     result = json.dumps(text)
     return templates.TemplateResponse("imagen.html", {"request": request, "img": img, "text": text, "result": result})
 
-
-
-
 @app.get("/jsontexto")
 async def jsontexto():
     #Este seria el json del texto extraido de la imagen:
@@ -71,18 +72,18 @@ async def jsontexto():
     img = Image.open(os.path.join(imgruta))
     text = pytesseract.image_to_string(img)
     result = json.dumps(text)
-    result2 = json.loads(result)
-    return {'json': result}, {'texto': result2}
+    #result2 = json.loads(result)
+    return {'json': result}
+    #return {'text': text}, {'json': result}, {'texto': result2}
 
 @app.get('/imagen') # Asi mostramos la imagen leida
 async def imagen():
     if os.path.exists(imgruta):
         img = Image.open(os.path.join(imgruta))
         text = pytesseract.image_to_string(img)
-        result = json.dumps(text)
+        
         return FileResponse(imgruta)
     return {"error": "El archivo no existe"}
-
 
 """
 @app.get('/imagen/<filenane>')

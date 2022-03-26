@@ -5,8 +5,19 @@
 	{{ text|safe }}
 	</pre>
     <div class="container">
+		{% if texto %}
+			<h1>Json & Texto</h1>
+			<!--<p>Json: {{jsontexto}} </p>-->
+			<p>Texto: {{texto}}   <form action="http://localhost:5000/convertiraudio"> <input type="submit" value="Convertir a Audio"/></form> </p>
+		{% else %}
+			<p> ------------- </p>
+		{% endif %}
 		<div class="container-fluid align-right mt-5 mb-5">
 			<a class="btn btn-secundary" href="/">Inicio</a>
 		</div>
     </div>
+	
+	
+	
 {% endblock %}
+

@@ -1,21 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify,send_from_directory, abort
+from flask import Flask, render_template, request, jsonify, send_from_directory #, abort, redirect, url_for,
 from werkzeug.utils import secure_filename
 from PIL import Image
-import os
-import base64
-import webbrowser
+import os, json, webbrowser# , base64
 from requests import get
 #import pytesseract
 #C:\Program Files\Tesseract-OCR
 #tessdata_dir_config = '--tessdata-dir"C:\\Program Files\\Tesseract-OCR\\tessdata"'
 #pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-#from gtts import gTTS
-#from playsound import playsound
+from gtts import gTTS
+from playsound import playsound
 
 if os.environ.get('DOCKER', '') == "yes":
     UPLOAD_FOLDER = 'C:\\Users\\zuric\\Documents\\EntornosPython\\Docker2\\resultados\\images'
 else:
     UPLOAD_FOLDER = '..\\resultados\\images'
+    UPLOAD_FOLDER_AUDIO = '..\\resultados\\audio'
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -24,6 +23,7 @@ def allowed_file(filename):
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER_AUDIO'] = UPLOAD_FOLDER_AUDIO
 
 @app.route("/")
 
@@ -45,10 +45,11 @@ def upload_file():
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             #return render_template('home.html')
             #return redirect(url_for("localhost:5050/imagen", filename=filename))
-            return render_template('results.html', text=("Imagen Subida Correctamente", filename, UPLOAD_FOLDER)) , webbrowser.open_new("http:localhost:5050/imagen")
-        return "Archivo no permitido"
+            return render_template('results.html', text=("Imagen Subida Correctamente","Nombre: " +  filename,"Destino: " + UPLOAD_FOLDER)) , webbrowser.open_new("http:localhost:5050/getimagen")
+    return render_template('home.html')
+
         
-        """img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+"""img = Image.open(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
         text = pytesseract.image_to_string(img)
         try:
             text = pytesseract.image_to_string(img)#, config=tessdata_dir_config)
@@ -59,10 +60,33 @@ def upload_file():
             myobj = gTTS(text=text, slow=False)
             myobj.save(app.config['UPLOAD_FOLDER'] + "/speech.mp3")
             playsound(app.config['UPLOAD_FOLDER'] + "/speech.mp3") """        
-    return render_template('home.html')
+
+"""@app.route('/recibirjson') #, methods = ['GET', ])
+def recibojson():
+    #if request.method == 'GET':
+    jsontexto = get("http://localhost:5050/jsontexto").json()
+    #texto = json.loads(jsontexto)
+    return jsontexto"""
 
 
-@app.route("/download/<filename>", methods=['GET'])
+@app.route('/recibirjson')
+def pasaratexto():
+    jsontexto = get("http://localhost:5050/jsontexto").json()
+    #texto = json.loads(jsontexto)
+    return render_template('results2.html', jsontexto=jsontexto)
+    #return render_template('results2.html', jsontexto=jsontexto, texto=str(texto))
+
+@app.route('/convertiraudio') #, methods = ['GET', ])
+def convertiraudio():
+    #if request.method == 'GET':
+    result2 = json.loads(pasaratexto())
+
+    myobj = gTTS(text=result2, slow=False)
+    myobj.save(app.config['UPLOAD_FOLDER_AUDIO'] + "/audio.mp3")
+    playsound(app.config['UPLOAD_FOLDER_AUDIO'] + "/audio.mp3")
+    return render_template("results.html", myobj=myobj)     
+         
+@app.route("/download/<filename>", methods=['GET']) #Para descargar archivos, no lo usamos
 #@app.route("http://localhost:5000/download/<filename>/download/*.*", methods=['GET'])
 def download(filename):
     if request.method == "GET":
