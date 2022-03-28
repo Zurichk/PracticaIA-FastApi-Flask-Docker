@@ -1,0 +1,2 @@
+docker build -t fastapi1
+docker run -d --name fastapicontenedor -p 5050:5050 fastapi1
