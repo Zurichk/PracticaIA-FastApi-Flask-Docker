@@ -1,2 +1,29 @@
 docker build -t fastapi1
 docker run -d --name fastapicontenedor -p 5050:5050 fastapi1
+
+
+
+Utiliza docker tag para generar una variante de tu imagen con ese nombre.
+docker tag docker2_web zurichk/docker2_web:v1
+
+docker push zurichk/docker2_web:v1
+
+
+docker push zurichk/actividadflaskfastapi:v1
+
+
+
+Creando el volumen
+docker container run -d --name docker2_web -e 
+
+
+docker container run -d --name docker2_web -e docker2_web_ALLOW_EMPTY_PASSWORD=True -v docker2_webdb:/var/lib/docker2_web docker2_web
+
+docker run -d -P --name docker2_web -v /src/webapp:/webapp training/webapp python app2.py
+
+docker volume ls
+
+
+docker run -d --name docker2 --mount source=mi-volumen,target=/app nginx:latest
+
+docker run -d --name docker2 --mount source=mi-volumen,target=/app zurichk/docker2_web:v1
